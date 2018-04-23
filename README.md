@@ -6,7 +6,7 @@ This library is free software; you can redistribute it and/or modify it under th
 
 In accordance with this license, we have chosen to publish Pi VU Meter under GPL version 3.0.
 
-Pi VU Meter is Derived from the SDL display version of the ameter ALSA level meter plugin.
+This VU meter is derived from https://github.com/pimoroni/pivumeter which is derived from the SDL display version of the ameter ALSA level meter plugin.
 
 ### Installing
 
@@ -67,6 +67,7 @@ Supported devices:
 * speaker-phat - Simple mono amplitude meter
 * scroll-phat - displays 11-band FFT-based EQ
 * scroll-phat-hd - displays 17-band FFT-based EQ
+* wiggins - Simple meter sent to a 10 led bar graph with a 595 shift register
 
 #### brightness
 
