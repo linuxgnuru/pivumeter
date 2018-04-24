@@ -280,7 +280,7 @@ int set_output_device(const char *output_device_name){
     #ifdef WITH_DEVICE_BARGRAPH
     if(strcmp(output_device_name, "bargraph") == 0){
         fprintf(stderr, "Using device: bargraph\n");
-        output_device = wiggins();
+        output_device = bargraph();
         return 0;
     }
 #endif

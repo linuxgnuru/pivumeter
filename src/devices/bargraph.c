@@ -86,8 +86,8 @@ static void update(int meter_level_l, int meter_level_r, snd_pcm_scope_ameter_t 
     if (meter_level_r > meter_level) meter_level = meter_level_r;
     brightness = level->led_brightness;
     bar = (meter_level / 15000.0f) * (brightness * 10.0f);
-    //led = map(bar, 0, 2796, 0, 10);
-    led = map(bar, 0, 3000, 0, 10);
+    //led = map(bar, 0, 3000, 0, 10);
+    led = map(bar, 0, 2796, 0, 10);
     //fprintf(stderr, "bar: %d\n", bar);
     doGraph(led);
 }
