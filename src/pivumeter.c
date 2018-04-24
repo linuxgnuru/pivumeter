@@ -277,6 +277,13 @@ int set_output_device(const char *output_device_name){
         return 0;
     }
 #endif
+    #ifdef WITH_DEVICE_WIGGINS
+    if(strcmp(output_device_name, "wiggins") == 0){
+        fprintf(stderr, "Using device: wiggins\n");
+        output_device = wiggins();
+        return 0;
+    }
+#endif
     return -1;
 }
 
