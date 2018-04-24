@@ -67,7 +67,7 @@ Supported devices:
 * speaker-phat - Simple mono amplitude meter
 * scroll-phat - displays 11-band FFT-based EQ
 * scroll-phat-hd - displays 17-band FFT-based EQ
-* wiggins - Simple meter sent to a 10 led bar graph with a 595 shift register
+* bargraph - Simple meter sent to a 10 led bar graph with a 595 shift register
 
 #### brightness
 

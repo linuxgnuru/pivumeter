@@ -6,19 +6,16 @@
 
 #include <wiringPi.h>
 #include <sr595.h>
-//#include <wiringPiI2C.h>
 #include "../pivumeter.h"
 
 #define ADDR_SR595 100
 #define BITS 8
 
-#define DATAPIN  21 // data blue (pin 14)
-#define LATCHPIN 22 // latch green (pin 12)
-#define CLOCKPIN 23 // clock yellow (pin 11)
+#define DATAPIN  25 // data blue (pin 14)
+#define LATCHPIN 26 // latch green (pin 12)
+#define CLOCKPIN 27 // clock yellow (pin 11)
 
-const int ledPins[] = { 25, 26 }; // for bar graph leds 9 and 10
-
-//static int stupid_led_mappings[10] = {0, 1, 2, 4, 6, 8, 10, 12, 14, 16};
+const int ledPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 
 static void Off()
 {
@@ -93,34 +90,12 @@ static void update(int meter_level_l, int meter_level_r, snd_pcm_scope_ameter_t 
     led = map(bar, 0, 3000, 0, 10);
     //fprintf(stderr, "bar: %d\n", bar);
     doGraph(led);
-    /*
-    if (bar < 0)
-        bar = 0;
-    if (bar > (brightness*10)) bar = (brightness*10);
-    for (led = 0; led < 10; led++)
-    {
-        int val = 0, index = led;
-        if (bar > brightness)
-        {
-            val = brightness;
-            bar -= brightness;
-        }
-        else if (bar > 0)
-        {
-            val = bar;
-            bar = 0;
-        }
-        if (level->bar_reverse == 1) index = 9 - led;
-        wiringPiI2CWriteReg8(i2c, 0x01 + stupid_led_mappings[index], val);
-    }
-    wiringPiI2CWriteReg8(i2c, 0x16, 0x01);
-    */
 }
 
-device wiggins()
+device bargraph()
 {
-    struct device _wiggins;
-    _wiggins.init = &init;
-    _wiggins.update = &update;
-    return _wiggins;
+    struct device _bargraph;
+    _bargraph.init = &init;
+    _bargraph.update = &update;
+    return _bargraph;
 }
