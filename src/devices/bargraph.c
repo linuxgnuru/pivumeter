@@ -23,25 +23,57 @@ static void Off()
     for (thisLed = 0; thisLed < 10; thisLed++)
     {
         if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, 0);
+#if 0
+        if (thisLed < 8)
+        {
+            switch (thisLed)
+            {
+                case 0: system("gpio -x sr595:200:8:25:27:26 write 200 0"); break;
+                case 1: system("gpio -x sr595:200:8:25:27:26 write 201 0"); break;
+                case 2: system("gpio -x sr595:200:8:25:27:26 write 202 0"); break;
+                case 3: system("gpio -x sr595:200:8:25:27:26 write 203 0"); break;
+                case 4: system("gpio -x sr595:200:8:25:27:26 write 204 0"); break;
+                case 5: system("gpio -x sr595:200:8:25:27:26 write 205 0"); break;
+                case 6: system("gpio -x sr595:200:8:25:27:26 write 206 0"); break;
+                case 7: system("gpio -x sr595:200:8:25:27:26 write 207 0"); break;
+            }
+        }
+#endif
         else digitalWrite(ledPins[thisLed - 8], 0);
     }
 }
 
-static void onOff(_Bool b)
+static void On()
 {
     int thisLed;
     for (thisLed = 0; thisLed < 10; thisLed++)
     {
-        if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, b);
-        else digitalWrite(ledPins[thisLed - 8], b);
+        if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, 1);
+#if 0
+        if (thisLed < 8)
+        {
+            switch (thisLed)
+            {
+                case 0: system("gpio -x sr595:200:8:25:27:26 write 200 1"); break;
+                case 1: system("gpio -x sr595:200:8:25:27:26 write 201 1"); break;
+                case 2: system("gpio -x sr595:200:8:25:27:26 write 202 1"); break;
+                case 3: system("gpio -x sr595:200:8:25:27:26 write 203 1"); break;
+                case 4: system("gpio -x sr595:200:8:25:27:26 write 204 1"); break;
+                case 5: system("gpio -x sr595:200:8:25:27:26 write 205 1"); break;
+                case 6: system("gpio -x sr595:200:8:25:27:26 write 206 1"); break;
+                case 7: system("gpio -x sr595:200:8:25:27:26 write 207 1"); break;
+            }
+        }
+#endif
+        else digitalWrite(ledPins[thisLed - 8], HIGH);
     }
 }
 
 static double map(float x, float x0, float x1, float y0, float y1)
 {
-	float y = y0 + ((y1 - y0) * ((x - x0) / (x1 - x0)));
+    float y = y0 + ((y1 - y0) * ((x - x0) / (x1 - x0)));
     double z = (double)y;
-	return z;
+    return z;
 }
 
 
@@ -52,13 +84,53 @@ static void doGraph(int num)
 
     if (num < 0 || num > 10) return;
     if (num == 0) Off();
-    else if (num == 10) onOff(1);
+    else if (num == 10) On();
     else
     {
         for (thisLed = 0; thisLed < 10; thisLed++)
         {
             toggle = (thisLed < num);
             if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, toggle);
+#if 0
+            if (thisLed < 8)
+            {
+                switch (thisLed)
+                {
+                    case 0:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 200 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 200 0");
+                        break;
+                    case 1:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 201 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 201 0");
+                        break;
+                    case 2:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 202 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 202 0");
+                        break;
+                    case 3:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 203 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 203 0");
+                        break;
+                    case 4:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 204 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 204 0");
+                        break;
+                    case 5:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 205 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 205 0");
+                        break;
+                    case 6:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 206 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 206 0");
+                        break;
+                    case 7:
+                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 207 1");
+                        else system("gpio -x sr595:200:8:25:27:26 write 207 0");
+                        break;
+                }
+            }
+#endif
             else digitalWrite(ledPins[thisLed - 8], toggle);
         }
     }
@@ -88,7 +160,7 @@ static void update(int meter_level_l, int meter_level_r, snd_pcm_scope_ameter_t 
     bar = (meter_level / 15000.0f) * (brightness * 10.0f);
     //led = map(bar, 0, 3000, 0, 10);
     led = map(bar, 0, 2796, 0, 10);
-    //fprintf(stderr, "bar: %d\n", bar);
+    fprintf(stderr, "bar: %d\n", bar);
     doGraph(led);
 }
 
