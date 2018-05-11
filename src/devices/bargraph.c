@@ -33,6 +33,8 @@ static void Off_1()
     backup_data_1[0] = data_1[0];
     wiringPiSPIDataRW(0, data_1, 1);
     data_1[0] = backup_data_1[0];
+    digitalWrite(23, LOW);
+    digitalWrite(24, LOW);
 }
 
 static void On_1()
@@ -41,6 +43,8 @@ static void On_1()
     backup_data_1[0] = data_1[0];
     wiringPiSPIDataRW(0, data_1, 1);
     data_1[0] = backup_data_1[0];
+    digitalWrite(23, HIGH);
+    digitalWrite(24, HIGH);
 }
 
 #if 0
