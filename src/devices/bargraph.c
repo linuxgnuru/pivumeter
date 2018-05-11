@@ -20,9 +20,15 @@ const int ledPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 static void Off()
 {
     int thisLed;
+    int lednum;
     for (thisLed = 0; thisLed < 10; thisLed++)
     {
-        if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, 0);
+        lednum = thisLed;
+        if (thisLed < 8)
+        {
+            lednum = abs(lednum - 7);
+            digitalWrite(ADDR_SR595 + lednum, 0);
+        }
 #if 0
         if (thisLed < 8)
         {
@@ -39,16 +45,25 @@ static void Off()
             }
         }
 #endif
-        else digitalWrite(ledPins[thisLed - 8], 0);
+        else
+        {
+            digitalWrite(ledPins[thisLed - 8], 0);
+        }
     }
 }
 
 static void On()
 {
     int thisLed;
+    int lednum;
     for (thisLed = 0; thisLed < 10; thisLed++)
     {
-        if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, 1);
+        lednum = thisLed;
+        if (thisLed < 8)
+        {
+            lednum = abs(lednum - 7);
+            digitalWrite(ADDR_SR595 + lednum, 1);
+        }
 #if 0
         if (thisLed < 8)
         {
@@ -65,7 +80,10 @@ static void On()
             }
         }
 #endif
-        else digitalWrite(ledPins[thisLed - 8], HIGH);
+        else
+        {
+            digitalWrite(ledPins[thisLed - 8], HIGH);
+        }
     }
 }
 
@@ -76,10 +94,10 @@ static double map(float x, float x0, float x1, float y0, float y1)
     return z;
 }
 
-
 static void doGraph(int num)
 {
     int thisLed;
+    int lednum;
     _Bool toggle;
 
     if (num < 0 || num > 10) return;
@@ -89,8 +107,13 @@ static void doGraph(int num)
     {
         for (thisLed = 0; thisLed < 10; thisLed++)
         {
+            lednum = thisLed;
             toggle = (thisLed < num);
-            if (thisLed < 8) digitalWrite(ADDR_SR595 + thisLed, toggle);
+            if (thisLed < 8)
+            {
+                lednum = abs(lednum - 7);
+                digitalWrite(ADDR_SR595 + lednum, toggle);
+            }
 #if 0
             if (thisLed < 8)
             {
@@ -131,8 +154,22 @@ static void doGraph(int num)
                 }
             }
 #endif
-            else digitalWrite(ledPins[thisLed - 8], toggle);
+            else
+            {
+                lednum -= 8;
+                digitalWrite(ledPins[lednum], toggle);
+            }
         }
+    }
+}
+
+static void Loop()
+{
+    int i;
+    for (i = 0; i < 11; i++)
+    {
+        doGraph(i);
+        delay(100);
     }
 }
 
@@ -142,6 +179,9 @@ static int init()
     sr595Setup(ADDR_SR595, BITS, DATAPIN, CLOCKPIN, LATCHPIN);
     pinMode(ledPins[0], OUTPUT);
     pinMode(ledPins[1], OUTPUT);
+    digitalWrite(ledPins[0], LOW);
+    digitalWrite(ledPins[1], LOW);
+    Loop();
     Off();
     atexit(Off);
     return 0;
@@ -160,7 +200,7 @@ static void update(int meter_level_l, int meter_level_r, snd_pcm_scope_ameter_t 
     bar = (meter_level / 15000.0f) * (brightness * 10.0f);
     //led = map(bar, 0, 3000, 0, 10);
     led = map(bar, 0, 2796, 0, 10);
-    fprintf(stderr, "bar: %d\n", bar);
+    //fprintf(stderr, "bar: %d\n", bar);
     doGraph(led);
 }
 

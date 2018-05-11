@@ -284,6 +284,13 @@ int set_output_device(const char *output_device_name){
         return 0;
     }
 #endif
+    #ifdef WITH_DEVICE_BARGRAPH_STEREO
+    if(strcmp(output_device_name, "bargraph-stereo") == 0){
+        fprintf(stderr, "Using device: bargraph-stereo\n");
+        output_device = bargraph_stereo();
+        return 0;
+    }
+#endif
     return -1;
 }
 

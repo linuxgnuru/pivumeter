@@ -4,3 +4,4 @@
 #include "phat-beat.h"
 #include "scroll-phat-hd.h"
 #include "bargraph.h"
+#include "bargraph-stereo.h"
