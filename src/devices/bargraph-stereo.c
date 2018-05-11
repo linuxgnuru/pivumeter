@@ -13,19 +13,19 @@
 unsigned char data[2] = { 0x0, 0x0 };
 unsigned char backup_data[2] = { 0x0, 0x0 };
 
-void bitWrite(int ab, unsigned int n, int b)
+void bitWrite(int ab, int n, int b)
 {
     if (ab < 0 || ab > 1) return;
     if (n <= 7 && n >= 0) data[ab] ^= (-b ^ data[ab]) & (1 << n);
 }
 
-void bitClear(int ab, unsigned int n)
+void bitClear(int ab, int n)
 {
     if (ab < 0 || ab > 1) return;
     if (n <= 7 && n >= 0) data[ab] ^= (0 ^ data[ab]) & (1 << n);
 }
 
-void bitSet(int ab, unsigned int n)
+void bitSet(int ab, int n)
 {
     if (ab < 0 || ab > 1) return;
     if (n <= 7 && n >= 0) data[ab] ^= (-1 ^ data[ab]) & (1 << n);

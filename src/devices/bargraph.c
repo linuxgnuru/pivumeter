@@ -5,18 +5,45 @@
 #include <string.h> // for fprintf
 
 #include <wiringPi.h>
-#include <sr595.h>
+//#include <sr595.h>
+#include <wiringPiSPI.h>
 #include "../pivumeter.h"
 
-#define ADDR_SR595 100
-#define BITS 8
+//#define ADDR_SR595 100
+//#define BITS 8
 
-#define DATAPIN  25 // data blue (pin 14)
-#define LATCHPIN 26 // latch green (pin 12)
-#define CLOCKPIN 27 // clock yellow (pin 11)
+//#define DATAPIN  25 // data blue (pin 14)
+//#define LATCHPIN 26 // latch green (pin 12)
+//#define CLOCKPIN 27 // clock yellow (pin 11)
 
 const int ledPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 
+unsigned char data_1[1] = { 0x0 };
+unsigned char backup_data_1[1] = { 0x0 };
+
+void bitWrite_1(int n, int b) { if (n <= 7 && n >= 0) data_1[0] ^= (-b ^ data_1[0]) & (1 << n); }
+
+void bitClear_1(int n) { if (n <= 7 && n >= 0) data_1[0] ^= (0 ^ data_1[0]) & (1 << n); }
+
+void bitSet_1(int n) { if (n <= 7 && n >= 0) data_1[0] ^= (-1 ^ data_1[0]) & (1 << n); }
+
+static void Off_1()
+{
+    data_1[0] = 0b00000000;
+    backup_data_1[0] = data_1[0];
+    wiringPiSPIDataRW(0, data_1, 1);
+    data_1[0] = backup_data_1[0];
+}
+
+static void On_1()
+{
+    data_1[0] = 0b11111111;
+    backup_data_1[0] = data_1[0];
+    wiringPiSPIDataRW(0, data_1, 1);
+    data_1[0] = backup_data_1[0];
+}
+
+#if 0
 static void Off()
 {
     int thisLed;
@@ -29,22 +56,6 @@ static void Off()
             lednum = abs(lednum - 7);
             digitalWrite(ADDR_SR595 + lednum, 0);
         }
-#if 0
-        if (thisLed < 8)
-        {
-            switch (thisLed)
-            {
-                case 0: system("gpio -x sr595:200:8:25:27:26 write 200 0"); break;
-                case 1: system("gpio -x sr595:200:8:25:27:26 write 201 0"); break;
-                case 2: system("gpio -x sr595:200:8:25:27:26 write 202 0"); break;
-                case 3: system("gpio -x sr595:200:8:25:27:26 write 203 0"); break;
-                case 4: system("gpio -x sr595:200:8:25:27:26 write 204 0"); break;
-                case 5: system("gpio -x sr595:200:8:25:27:26 write 205 0"); break;
-                case 6: system("gpio -x sr595:200:8:25:27:26 write 206 0"); break;
-                case 7: system("gpio -x sr595:200:8:25:27:26 write 207 0"); break;
-            }
-        }
-#endif
         else
         {
             digitalWrite(ledPins[thisLed - 8], 0);
@@ -64,28 +75,13 @@ static void On()
             lednum = abs(lednum - 7);
             digitalWrite(ADDR_SR595 + lednum, 1);
         }
-#if 0
-        if (thisLed < 8)
-        {
-            switch (thisLed)
-            {
-                case 0: system("gpio -x sr595:200:8:25:27:26 write 200 1"); break;
-                case 1: system("gpio -x sr595:200:8:25:27:26 write 201 1"); break;
-                case 2: system("gpio -x sr595:200:8:25:27:26 write 202 1"); break;
-                case 3: system("gpio -x sr595:200:8:25:27:26 write 203 1"); break;
-                case 4: system("gpio -x sr595:200:8:25:27:26 write 204 1"); break;
-                case 5: system("gpio -x sr595:200:8:25:27:26 write 205 1"); break;
-                case 6: system("gpio -x sr595:200:8:25:27:26 write 206 1"); break;
-                case 7: system("gpio -x sr595:200:8:25:27:26 write 207 1"); break;
-            }
-        }
-#endif
         else
         {
             digitalWrite(ledPins[thisLed - 8], HIGH);
         }
     }
 }
+#endif
 
 static double map(float x, float x0, float x1, float y0, float y1)
 {
@@ -101,8 +97,8 @@ static void doGraph(int num)
     _Bool toggle;
 
     if (num < 0 || num > 10) return;
-    if (num == 0) Off();
-    else if (num == 10) On();
+    else if (num == 0) Off_1();
+    else if (num == 10) On_1();
     else
     {
         for (thisLed = 0; thisLed < 10; thisLed++)
@@ -112,48 +108,12 @@ static void doGraph(int num)
             if (thisLed < 8)
             {
                 lednum = abs(lednum - 7);
-                digitalWrite(ADDR_SR595 + lednum, toggle);
+                bitWrite_1(lednum, toggle);
+                backup_data_1[0] = data_1[0];
+                wiringPiSPIDataRW(0, data_1, 1);
+                data_1[0] = backup_data_1[0];
+                //digitalWrite(ADDR_SR595 + lednum, toggle);
             }
-#if 0
-            if (thisLed < 8)
-            {
-                switch (thisLed)
-                {
-                    case 0:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 200 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 200 0");
-                        break;
-                    case 1:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 201 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 201 0");
-                        break;
-                    case 2:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 202 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 202 0");
-                        break;
-                    case 3:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 203 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 203 0");
-                        break;
-                    case 4:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 204 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 204 0");
-                        break;
-                    case 5:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 205 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 205 0");
-                        break;
-                    case 6:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 206 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 206 0");
-                        break;
-                    case 7:
-                        if (toggle) system("gpio -x sr595:200:8:25:27:26 write 207 1");
-                        else system("gpio -x sr595:200:8:25:27:26 write 207 0");
-                        break;
-                }
-            }
-#endif
             else
             {
                 lednum -= 8;
@@ -163,27 +123,16 @@ static void doGraph(int num)
     }
 }
 
-static void Loop()
-{
-    int i;
-    for (i = 0; i < 11; i++)
-    {
-        doGraph(i);
-        delay(100);
-    }
-}
-
 static int init()
 {
     wiringPiSetup();
-    sr595Setup(ADDR_SR595, BITS, DATAPIN, CLOCKPIN, LATCHPIN);
+    wiringPiSPISetup(0, 500000);
     pinMode(ledPins[0], OUTPUT);
     pinMode(ledPins[1], OUTPUT);
     digitalWrite(ledPins[0], LOW);
     digitalWrite(ledPins[1], LOW);
-    Loop();
-    Off();
-    atexit(Off);
+    Off_1();
+    atexit(Off_1);
     return 0;
 }
 
