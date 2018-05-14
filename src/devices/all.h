@@ -5,3 +5,4 @@
 #include "scroll-phat-hd.h"
 #include "bargraph.h"
 #include "bargraph-stereo.h"
+#include "gpio-bargraph-stereo.h"

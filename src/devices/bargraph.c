@@ -16,7 +16,7 @@
 //#define LATCHPIN 26 // latch green (pin 12)
 //#define CLOCKPIN 27 // clock yellow (pin 11)
 
-const int ledPins[] = { 23, 24 }; // for bar graph leds 9 and 10
+const int extraLedPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 
 unsigned char data_1[1] = { 0x0 };
 unsigned char backup_data_1[1] = { 0x0 };
@@ -121,7 +121,7 @@ static void doGraph(int num)
             else
             {
                 lednum -= 8;
-                digitalWrite(ledPins[lednum], toggle);
+                digitalWrite(extraLedPins[lednum], toggle);
             }
         }
     }
@@ -131,10 +131,10 @@ static int init()
 {
     wiringPiSetup();
     wiringPiSPISetup(0, 500000);
-    pinMode(ledPins[0], OUTPUT);
-    pinMode(ledPins[1], OUTPUT);
-    digitalWrite(ledPins[0], LOW);
-    digitalWrite(ledPins[1], LOW);
+    pinMode(extraLedPins[0], OUTPUT);
+    pinMode(extraLedPins[1], OUTPUT);
+    digitalWrite(extraLedPins[0], LOW);
+    digitalWrite(extraLedPins[1], LOW);
     Off_1();
     atexit(Off_1);
     return 0;
