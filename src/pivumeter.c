@@ -298,6 +298,13 @@ int set_output_device(const char *output_device_name){
         return 0;
     }
 #endif
+    #ifdef WITH_DEVICE_GPIO_10_BARGRAPH
+    if(strcmp(output_device_name, "gpio-10-bargraph") == 0){
+        fprintf(stderr, "Using device: gpio-10-bargraph\n");
+        output_device = gpio_10_bargraph();
+        return 0;
+    }
+#endif
     return -1;
 }
 
