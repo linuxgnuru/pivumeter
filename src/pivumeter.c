@@ -279,15 +279,29 @@ int set_output_device(const char *output_device_name){
 #endif
     #ifdef WITH_DEVICE_BARGRAPH
     if(strcmp(output_device_name, "bargraph") == 0){
-        fprintf(stderr, "Using device: bargraph\n");
+        //fprintf(stderr, "Using device: bargraph\n");
         output_device = bargraph();
+        return 0;
+    }
+#endif
+    #ifdef WITH_DEVICE_GPIO_10_BARGRAPH
+    if(strcmp(output_device_name, "gpio-10-bargraph") == 0){
+        //fprintf(stderr, "Using device: gpio-10-bargraph\n");
+        output_device = gpio_10_bargraph();
         return 0;
     }
 #endif
     #ifdef WITH_DEVICE_BARGRAPH_STEREO
     if(strcmp(output_device_name, "bargraph-stereo") == 0){
-        fprintf(stderr, "Using device: bargraph-stereo\n");
+        //fprintf(stderr, "Using device: bargraph-stereo\n");
         output_device = bargraph_stereo();
+        return 0;
+    }
+#endif
+    #ifdef WITH_DEVICE_GPIO_BARGRAPH_STEREO
+    if(strcmp(output_device_name, "gpio-bargraph-stereo") == 0){
+        //fprintf(stderr, "Using device: gpio-bargraph-stereo\n");
+        output_device = gpio_bargraph_stereo();
         return 0;
     }
 #endif
