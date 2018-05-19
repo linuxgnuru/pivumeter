@@ -16,7 +16,7 @@
 //#define LATCHPIN 26 // latch green (pin 12)
 //#define CLOCKPIN 27 // clock yellow (pin 11)
 
-const int ledPins[] = { 23, 24 }; // for bar graph leds 9 and 10
+const int extraLedPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 
 unsigned char data_1[1] = { 0x0 };
 unsigned char backup_data_1[1] = { 0x0 };
@@ -33,6 +33,8 @@ static void Off_1()
     backup_data_1[0] = data_1[0];
     wiringPiSPIDataRW(0, data_1, 1);
     data_1[0] = backup_data_1[0];
+    digitalWrite(23, LOW);
+    digitalWrite(24, LOW);
 }
 
 static void On_1()
@@ -41,6 +43,8 @@ static void On_1()
     backup_data_1[0] = data_1[0];
     wiringPiSPIDataRW(0, data_1, 1);
     data_1[0] = backup_data_1[0];
+    digitalWrite(23, HIGH);
+    digitalWrite(24, HIGH);
 }
 
 #if 0
@@ -117,7 +121,7 @@ static void doGraph(int num)
             else
             {
                 lednum -= 8;
-                digitalWrite(ledPins[lednum], toggle);
+                digitalWrite(extraLedPins[lednum], toggle);
             }
         }
     }
@@ -127,10 +131,10 @@ static int init()
 {
     wiringPiSetup();
     wiringPiSPISetup(0, 500000);
-    pinMode(ledPins[0], OUTPUT);
-    pinMode(ledPins[1], OUTPUT);
-    digitalWrite(ledPins[0], LOW);
-    digitalWrite(ledPins[1], LOW);
+    pinMode(extraLedPins[0], OUTPUT);
+    pinMode(extraLedPins[1], OUTPUT);
+    digitalWrite(extraLedPins[0], LOW);
+    digitalWrite(extraLedPins[1], LOW);
     Off_1();
     atexit(Off_1);
     return 0;
