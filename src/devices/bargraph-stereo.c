@@ -63,9 +63,9 @@ static void Off_r()
     data[1] = backup_data[1];
 }
 
-static void On_r()
+static void Off_l()
 {
-    data[1] = 0b11111111;
+    data[0] = 0b00000000;
     backup_data[0] = data[0];
     backup_data[1] = data[1];
     wiringPiSPIDataRW(0, data, 2);
@@ -73,9 +73,10 @@ static void On_r()
     data[1] = backup_data[1];
 }
 
-static void Off_l()
+/*
+static void On_r()
 {
-    data[0] = 0b00000000;
+    data[1] = 0b11111111;
     backup_data[0] = data[0];
     backup_data[1] = data[1];
     wiringPiSPIDataRW(0, data, 2);
@@ -92,6 +93,7 @@ static void On_l()
     data[0] = backup_data[0];
     data[1] = backup_data[1];
 }
+*/
 
 static double map(float x, float x0, float x1, float y0, float y1)
 {
