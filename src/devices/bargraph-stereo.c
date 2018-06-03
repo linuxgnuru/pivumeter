@@ -8,57 +8,35 @@
 #include <wiringPiSPI.h>
 #include "../pivumeter.h"
 
+#define CE 1
+
 //#define DO_LOOP
 
 unsigned char data[2] = { 0x0, 0x0 };
 unsigned char backup_data[2] = { 0x0, 0x0 };
 
-void bitWrite(int ab, int n, int b)
-{
-    if (ab < 0 || ab > 1) return;
-    if (n <= 7 && n >= 0) data[ab] ^= (-b ^ data[ab]) & (1 << n);
-}
+void bitWrite(int ab, int n, int b) { data[ab] ^= (-b ^ data[ab]) & (1 << n); }
 
-void bitClear(int ab, int n)
-{
-    if (ab < 0 || ab > 1) return;
-    if (n <= 7 && n >= 0) data[ab] ^= (0 ^ data[ab]) & (1 << n);
-}
+void bitClear(int ab, int n) { data[ab] ^= (0 ^ data[ab]) & (1 << n); }
 
-void bitSet(int ab, int n)
-{
-    if (ab < 0 || ab > 1) return;
-    if (n <= 7 && n >= 0) data[ab] ^= (-1 ^ data[ab]) & (1 << n);
-}
+void bitSet(int ab, int n) { data[ab] ^= (-1 ^ data[ab]) & (1 << n); }
 
 static void Off()
 {
     data[0] = data[1] = 0x0;
     backup_data[0] = data[0];
     backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
+    wiringPiSPIDataRW(CE, data, 2);
     data[0] = backup_data[0];
     data[1] = backup_data[1];
 }
-
-/*
-static void On()
-{
-    data[0] = data[1] = 0xff;
-    backup_data[0] = data[0];
-    backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
-    data[0] = backup_data[0];
-    data[1] = backup_data[1];
-}
-*/
 
 static void Off_r()
 {
     data[1] = 0b00000000;
     backup_data[0] = data[0];
     backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
+    wiringPiSPIDataRW(CE, data, 2);
     data[0] = backup_data[0];
     data[1] = backup_data[1];
 }
@@ -68,32 +46,10 @@ static void Off_l()
     data[0] = 0b00000000;
     backup_data[0] = data[0];
     backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
+    wiringPiSPIDataRW(CE, data, 2);
     data[0] = backup_data[0];
     data[1] = backup_data[1];
 }
-
-/*
-static void On_r()
-{
-    data[1] = 0b11111111;
-    backup_data[0] = data[0];
-    backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
-    data[0] = backup_data[0];
-    data[1] = backup_data[1];
-}
-
-static void On_l()
-{
-    data[0] = 0b11111111;
-    backup_data[0] = data[0];
-    backup_data[1] = data[1];
-    wiringPiSPIDataRW(0, data, 2);
-    data[0] = backup_data[0];
-    data[1] = backup_data[1];
-}
-*/
 
 static double map(float x, float x0, float x1, float y0, float y1)
 {
@@ -109,7 +65,6 @@ static void doGraph(int num_r, int num_l)
     _Bool con_l, con_r;
 
     con_l = con_r = 1;
-//fprintf(stderr, "num_l,num_r: %d,%d\n", num_l, num_r);
     if (num_r < 0 || num_r > 8) return;
     else if (num_l < 0 || num_l > 8) return;
 //    else if (num_l == 0) Off_l();
@@ -118,7 +73,6 @@ static void doGraph(int num_r, int num_l)
 //    else if (num_r == 8) On_r();
     else
     {
-//        fprintf(stderr, "num_l,num_r: %d,%d\n", num_l, num_r);
         // left side
         for (i = 0; i < 8; i++)
         {
@@ -134,44 +88,28 @@ static void doGraph(int num_r, int num_l)
                 Off_l();
                 con_l = 0;
             }
-            //fprintf(stderr, "thisLed_l: %d\n", thisLed_l);
             if (con_l)
             {
-                //fprintf(stderr, "thisLed_l, num_l: %d, %d\n", thisLed_l, num_l);
                 toggle_l = (thisLed_l < num_l);
                 bitWrite(0, thisLed_l, toggle_l);
                 backup_data[0] = data[0];
                 backup_data[1] = data[1];
-                wiringPiSPIDataRW(0, data, 2);
+                wiringPiSPIDataRW(CE, data, 2);
                 data[0] = backup_data[0];
                 data[1] = backup_data[1];
             }
             if (con_r)
             {
                 toggle_r = (thisLed_l < num_r);
-                //fprintf(stderr, "thisLed_l, num_r, toggle_r: %d, %d, %d\n", thisLed_l, num_r, toggle_r);
                 bitWrite(1, thisLed_r, toggle_r);
                 backup_data[0] = data[0];
                 backup_data[1] = data[1];
-                wiringPiSPIDataRW(0, data, 2);
+                wiringPiSPIDataRW(CE, data, 2);
                 data[0] = backup_data[0];
                 data[1] = backup_data[1];
             }
             con_l = con_r = 1;
         }
-        /*
-        // right side
-        for (thisLed = 0; thisLed < 8; thisLed++)
-        {
-            toggle = (thisLed > num_r);
-            bitWrite(1, thisLed, toggle);
-            backup_data[0] = data[0];
-            backup_data[1] = data[1];
-            wiringPiSPIDataRW(0, data, 2);
-            data[0] = backup_data[0];
-            data[1] = backup_data[1];
-        }
-        */
     }
 }
 
@@ -190,7 +128,7 @@ static void Loop()
 static int init()
 {
     wiringPiSetup();
-    wiringPiSPISetup(0, 500000);
+    wiringPiSPISetup(CE, 500000);
 #ifdef DO_LOOP
     Loop();
 #endif
@@ -202,19 +140,14 @@ static int init()
 static void update(int meter_level_l, int meter_level_r, snd_pcm_scope_ameter_t *level)
 {
     int led_l, led_r;
-    //int meter_level;
     int brightness;
     int bar_r, bar_l;
 
-    //meter_level = meter_level_l;
-    //if (meter_level_r > meter_level) meter_level = meter_level_r;
     brightness = level->led_brightness;
     bar_r = (meter_level_r / 15000.0f) * (brightness * 10.0f);
     bar_l = (meter_level_l / 15000.0f) * (brightness * 10.0f);
-    //led = map(bar, 0, 3000, 0, 10);
     led_r = map(bar_r, 0, 2796, 0, 8);
     led_l = map(bar_l, 0, 2796, 0, 8);
-    //fprintf(stderr, "r,l: %d,%d\n", led_r, led_l);
     doGraph(led_r, led_l);
 }
 

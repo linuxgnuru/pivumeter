@@ -5,16 +5,10 @@
 #include <string.h> // for fprintf
 
 #include <wiringPi.h>
-//#include <sr595.h>
 #include <wiringPiSPI.h>
 #include "../pivumeter.h"
 
-//#define ADDR_SR595 100
-//#define BITS 8
-
-//#define DATAPIN  25 // data blue (pin 14)
-//#define LATCHPIN 26 // latch green (pin 12)
-//#define CLOCKPIN 27 // clock yellow (pin 11)
+#define CE 1
 
 const int extraLedPins[] = { 23, 24 }; // for bar graph leds 9 and 10
 
@@ -31,7 +25,7 @@ static void Off_1()
 {
     data_1[0] = 0b00000000;
     backup_data_1[0] = data_1[0];
-    wiringPiSPIDataRW(0, data_1, 1);
+    wiringPiSPIDataRW(CE, data_1, 1);
     data_1[0] = backup_data_1[0];
     digitalWrite(23, LOW);
     digitalWrite(24, LOW);
@@ -41,51 +35,11 @@ static void On_1()
 {
     data_1[0] = 0b11111111;
     backup_data_1[0] = data_1[0];
-    wiringPiSPIDataRW(0, data_1, 1);
+    wiringPiSPIDataRW(CE, data_1, 1);
     data_1[0] = backup_data_1[0];
     digitalWrite(23, HIGH);
     digitalWrite(24, HIGH);
 }
-
-#if 0
-static void Off()
-{
-    int thisLed;
-    int lednum;
-    for (thisLed = 0; thisLed < 10; thisLed++)
-    {
-        lednum = thisLed;
-        if (thisLed < 8)
-        {
-            lednum = abs(lednum - 7);
-            digitalWrite(ADDR_SR595 + lednum, 0);
-        }
-        else
-        {
-            digitalWrite(ledPins[thisLed - 8], 0);
-        }
-    }
-}
-
-static void On()
-{
-    int thisLed;
-    int lednum;
-    for (thisLed = 0; thisLed < 10; thisLed++)
-    {
-        lednum = thisLed;
-        if (thisLed < 8)
-        {
-            lednum = abs(lednum - 7);
-            digitalWrite(ADDR_SR595 + lednum, 1);
-        }
-        else
-        {
-            digitalWrite(ledPins[thisLed - 8], HIGH);
-        }
-    }
-}
-#endif
 
 static double map(float x, float x0, float x1, float y0, float y1)
 {
@@ -114,9 +68,8 @@ static void doGraph(int num)
                 lednum = abs(lednum - 7);
                 bitWrite_1(lednum, toggle);
                 backup_data_1[0] = data_1[0];
-                wiringPiSPIDataRW(0, data_1, 1);
+                wiringPiSPIDataRW(CE, data_1, 1);
                 data_1[0] = backup_data_1[0];
-                //digitalWrite(ADDR_SR595 + lednum, toggle);
             }
             else
             {
@@ -130,7 +83,7 @@ static void doGraph(int num)
 static int init()
 {
     wiringPiSetup();
-    wiringPiSPISetup(0, 500000);
+    wiringPiSPISetup(CE, 500000);
     pinMode(extraLedPins[0], OUTPUT);
     pinMode(extraLedPins[1], OUTPUT);
     digitalWrite(extraLedPins[0], LOW);
